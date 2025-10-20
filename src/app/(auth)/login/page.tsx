@@ -4,12 +4,8 @@ import React from "react";
 
 const Page = async () => {
   await requireUnauth();
-  
-  return (
-    <div>
-      <LoginForm />
-    </div>
-  );
+
+  return <LoginForm />;
 };
 
 export default Page;
