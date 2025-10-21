@@ -1,25 +1,39 @@
 import prisma from "@/lib/db";
 import { inngest } from "./client";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { generateText } from "ai";
+import { createOpenAI } from '@ai-sdk/openai';
+import { createAnthropic } from '@ai-sdk/anthropic';
 
-export const helloWorld = inngest.createFunction(
-  { id: "hello-world", retries: 5,  },
-  { event: "test/hello.world" },
+const google = createGoogleGenerativeAI();
+const openai = createOpenAI();
+const anthropic = createAnthropic();
+
+export const execute = inngest.createFunction(
+  { id: "execute-ai", retries: 5 },
+  { event: "execute/ai" },
   async ({ event, step }) => {
-    // Simulate a wait
-    await step.sleep("wait-a-moment", "10s");
 
-    // Simulate another wait
-    await step.sleep("proccessing", "10s");
-
-    // Return a greeting message
-    await step.sleep("creating final result", "10s");
-
-    await step.run("createo-workflow", () => {
-      return prisma.workflow.create({
-        data: {
-          name: "inngest workflow testing... ",
-        },
-      });
+    const { steps: geminiSteps } = await step.ai.wrap("gemini-generate-test", generateText, {
+      model: google("gemini-2.5-flash"),
+      system: "You are a shitty man",
+      prompt: "Who are you?",
     });
+
+    const { steps: openaiSteps } = await step.ai.wrap("openai-generate-test", generateText, {
+      model: openai("gpt-4"),
+      system: "You are a shitty man",
+      prompt: "Who are you?",
+    });
+
+    const { steps: anthropicSteps } = await step.ai.wrap("claude-generate-test", generateText, {
+      model: anthropic("claude-3-5-haiku-latest"),
+      system: "You are a shitty man",
+      prompt: "Who are you?",
+    });
+
+    return {
+      geminiSteps, openaiSteps, anthropicSteps
+    };
   }
 );
