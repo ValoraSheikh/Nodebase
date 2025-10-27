@@ -23,7 +23,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { useHasActiveSubscription } from "../app/features/subscriptions/hooks/use-subscription";
+import { useHasActiveSubscription } from "../features/subscriptions/hooks/use-subscription";
 
 const menuItems = [
   {
